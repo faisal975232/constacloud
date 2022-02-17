@@ -12,14 +12,12 @@ class StudentController extends Controller
 {
     public function liststudents(Request $request)
     {
-
         return view("students");
     }
 
     public function create(Request $request)
     {
-
-        $validatedData = $request->validate([
+         $validatedData = $request->validate([
             'name' => 'required',
             'roll' => 'required|min:6|unique:students,rollno',
             'class' => 'required'
@@ -29,63 +27,56 @@ class StudentController extends Controller
             'class.required' => 'Class  is required'
         ]);
 
-        if($request->file('upload_file')){
+        if ($request->file('upload_file')) {
 
             $ext = $request->file('upload_file')->getClientOriginalExtension();
 
             $filename = time() . "." . $ext;
-    
-            $path = $request->file('upload_file')->storeAs(
-                 'public',$filename
-            );;
-    
-            $student = Student::create([
-                "name" => $request->name,
-                "rollno" => $request->roll,
-                "class" => $request->class,
-                "maths" => $request->math,
-                "end" => $request->eng,
-                "science" => $request->science,
-                "hindi" => $request->hindi,
-                "urdu" => $request->urdu,
-                'image'=> $filename
-            ]);
-        }
-        else {
-            $student = Student::create([
-                "name" => $request->name,
-                "rollno" => $request->roll,
-                "class" => $request->class,
-                "maths" => $request->math,
-                "end" => $request->eng,
-                "science" => $request->science,
-                "hindi" => $request->hindi,
-                "urdu" => $request->urdu,
-               
-            ]);
-        }
-       
 
+            $path = $request->file('upload_file')->storeAs(
+                'public',
+                $filename
+            );;
+
+            $student = Student::create([
+                "name" => $request->name,
+                "rollno" => $request->roll,
+                "class" => $request->class,
+                "maths" => $request->math,
+                "end" => $request->eng,
+                "science" => $request->science,
+                "hindi" => $request->hindi,
+                "urdu" => $request->urdu,
+                'image' => $filename
+            ]);
+        } else {
+            $student = Student::create([
+                "name" => $request->name,
+                "rollno" => $request->roll,
+                "class" => $request->class,
+                "maths" => $request->math,
+                "end" => $request->eng,
+                "science" => $request->science,
+                "hindi" => $request->hindi,
+                "urdu" => $request->urdu,
+
+            ]);
+        }
         return back()->with('success', 'Succesfully Added');
     }
 
-    public function apistudent(){
-
-        $student = Student::select('name as student_name','rollno','image','class', DB::raw("maths + end + hindi + urdu + science as total_score"))->orderBy('total_score','DESC')->get();
+    // apicontroller
+    public function apistudent()
+    {
+        $student = Student::select('name as student_name', 'rollno', 'image', 'class', DB::raw("maths + end + hindi + urdu + science as total_score"))->orderBy('total_score', 'DESC')->get();
 
         return $student;
-       
-
     }
 
-    public function students(){
-        
-            $student = Student::get();
-            return Datatables::of($student)->make(true);
-         
-       
+    // tableajaxcontroller
+    public function students()
+    {
+        $student = Student::get();
+        return Datatables::of($student)->make(true);
     }
-
-
-    
 }
